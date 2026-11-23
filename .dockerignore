@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.env
+.jest-cache
+coverage
+rdm
+docs
+*.md
+*.mp4

@@ -1,0 +1,89 @@
+# EstuLanches — ambiente de produção com Docker Compose.
+# Todas as credenciais vêm do arquivo .env (que NÃO é versionado). Veja .env.example.
+name: estulanches
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+    volumes:
+      # Dados persistentes: sobrevivem a "docker compose down" e a reinícios.
+      - postgres_data:/var/lib/postgresql/data
+      # Cria as tabelas e o cardápio inicial somente na primeira inicialização do volume.
+      - ./init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    networks: [estu-interna]       # sem "ports": o banco não é acessível de fora do Docker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits: { cpus: '1.00', memory: 512M }
+
+  app:
+    build:
+      context: .
+      target: production
+    # Somente as variáveis que a aplicação precisa (nada de env_file com tudo).
+    environment:
+      NODE_ENV: production
+      PORT: "3000"                 # porta INTERNA fixa; a porta do host é HOST_PORT
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${HOST_PORT:-3000}:3000"  # única porta publicada no host
+    networks: [estu-interna, estu-edge]
+    depends_on:
+      db:
+        condition: service_healthy   # a aplicação só inicia depois que o banco estiver pronto
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    # Endurecimento do container da aplicação.
+    read_only: true                # sistema de arquivos somente leitura
+    tmpfs: [/tmp]
+    cap_drop: [ALL]                # sem capabilities do Linux
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits: { cpus: '1.00', memory: 256M }
+
+  # Serviço de testes de integração (só roda com: docker compose --profile test ...).
+  tests:
+    build:
+      context: .
+      target: test
+    environment:
+      NODE_ENV: test
+      LOG_LEVEL: silent
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    networks: [estu-interna]
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: [test]
+    volumes:
+      - ./rdm:/app/rdm             # grava rdm/testes-integracao.json no host
+
+volumes:
+  postgres_data:
+
+networks:
+  # Rede interna: sem acesso à internet nem ao host. Só app e db conversam aqui.
+  estu-interna:
+    driver: bridge
+    internal: true
+  # Rede usada apenas para publicar a porta da aplicação no host.
+  estu-edge:
+    driver: bridge

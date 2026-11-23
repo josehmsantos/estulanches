@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#146c5a"><title>EstuLanches | Cantina escolar</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar"><div class="brand"><span class="brand-mark">E</span><div><strong>EstuLanches</strong><small>Cantina escolar</small></div></div><span id="health" class="health">Conectando…</span></header>
+  <main class="container">
+    <section class="hero"><div><p class="eyebrow">BOM DIA!</p><h1>O que vamos servir hoje?</h1><p>Gerencie o cardápio, registre pedidos e acompanhe cada preparo.</p></div><div class="hero-icon" aria-hidden="true">🥪</div></section>
+    <nav class="tabs" aria-label="Seções"><button class="tab active" data-view="menu">Cardápio</button><button class="tab" data-view="new-order">Novo pedido</button><button class="tab" data-view="orders">Pedidos <span id="order-count" class="badge">0</span></button></nav>
+    <section id="menu-view" class="view active">
+      <div class="section-heading"><div><p class="eyebrow">NOSSA VITRINE</p><h2>Cardápio</h2></div><button id="new-product" class="button primary">＋ Novo produto</button></div>
+      <div id="products" class="product-grid"></div>
+      <form id="product-form" class="panel form-panel hidden"><div class="section-heading"><h3 id="product-form-title">Novo produto</h3><button type="button" class="icon-button" id="close-product" aria-label="Fechar">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Nome<input name="name" required maxlength="120" placeholder="Ex.: Pão de queijo"></label><label>Categoria<input name="category" required maxlength="60" placeholder="Ex.: Salgados"></label><label>Preço (R$)<input name="price" type="number" min="0" step="0.01" required></label><label class="check-label"><input name="available" type="checkbox" checked> Disponível para venda</label><label class="full">Descrição<textarea name="description" maxlength="500" rows="2" placeholder="Ingredientes ou detalhes"></textarea></label></div><div class="form-actions"><button type="button" id="cancel-product" class="button secondary">Cancelar</button><button class="button primary">Salvar produto</button></div></form>
+    </section>
+    <section id="new-order-view" class="view">
+      <div class="section-heading"><div><p class="eyebrow">ATENDIMENTO</p><h2>Novo pedido</h2></div></div>
+      <form id="order-form" class="panel"><label>Nome do aluno ou cliente<input name="customerName" required maxlength="120" placeholder="Quem está fazendo o pedido?"></label><div class="order-layout"><div><h3>Escolha os itens</h3><div id="order-products" class="order-product-list"></div></div><aside class="order-summary"><h3>Resumo</h3><div id="order-lines" class="muted">Adicione itens ao pedido.</div><div class="total-row"><span>Total</span><strong id="order-total">R$ 0,00</strong></div><button class="button primary wide">Registrar pedido</button></aside></div></form>
+    </section>
+    <section id="orders-view" class="view"><div class="section-heading"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Pedidos</h2></div><button id="refresh-orders" class="button secondary">Atualizar</button></div><div id="orders" class="orders-list"></div></section>
+    <div id="toast" role="status" class="toast" aria-live="polite"></div>
+  </main><footer>EstuLanches <span>•</span> feito para servir bem</footer>
+  <script src="/app.js" defer></script>
+</body></html>

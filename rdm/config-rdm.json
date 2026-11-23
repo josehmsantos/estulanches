@@ -1,0 +1,18 @@
+{
+  "responsavel": {
+    "cargo": "Técnico de Implantação",
+    "nome": "PREENCHER: seu nome"
+  },
+  "ambiente": "Produção (Docker Compose)",
+  "tipoMudanca": "Implantação em containers Docker",
+  "descricao": "Implantação do EstuLanches (cardápio e pedidos da cantina escolar) em ambiente de produção com Docker Compose: aplicação Node.js/Express e banco PostgreSQL em containers separados, rede interna isolada, volume persistente, healthchecks e testes automatizados unitários e de integração.",
+  "mudancas": [
+    ["Imagem base Node.js", "node:20-alpine (sem suporte)", "node:22-alpine"],
+    ["Porta", "PORT único (app e host)", "PORT interno 3000 + HOST_PORT no host"],
+    ["Credenciais", "senha de exemplo versionada", "placeholder + senha aleatória; .env fora do Git"],
+    ["Container da aplicação", "env_file completo", "só variáveis necessárias, read_only, sem capabilities"],
+    ["Dependência zod", "3.x (vulnerabilidade alta)", "4.6.7 (npm audit: 0 vulnerabilidades)"],
+    ["Excluir produto já pedido", "erro HTTP 500", "HTTP 409 com mensagem clara"]
+  ],
+  "observacoes": ""
+}
