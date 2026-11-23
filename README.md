@@ -145,3 +145,7 @@ Se for um repositório novo: crie-o vazio no GitHub e use `git remote add origin
 - A API aceita qualquer troca de status de pedido (por exemplo, de `ENTREGUE` de volta para `RECEBIDO`); não há máquina de estados.
 - Produtos já usados em pedidos não podem ser excluídos (a API responde 409); marque-os como indisponíveis.
 - A configuração Docker e os scripts `validar`/`persistencia`/`rdm` precisam de um daemon Docker com acesso ao Docker Hub para baixar `postgres:16-alpine` e `node:22-alpine`.
+
+
+
+Video: https://drive.google.com/file/d/1SI7IQD9A4zPiUPnJXjE7P1wOY7ObgMKz/view?usp=sharing
